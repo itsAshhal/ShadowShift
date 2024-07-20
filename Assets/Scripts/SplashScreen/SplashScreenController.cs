@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using ShadowShift.DataModels;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -8,6 +9,7 @@ namespace ShadowShift
 {
     public class SplashScreenController : MonoBehaviour
     {
+        [SerializeField] ControlType m_ControlType;
         public float DelayTimeFor_Dot;
         public float DelayTimeFor_R;
         public float DelayTimeFor_BottomSpring;
@@ -29,6 +31,7 @@ namespace ShadowShift
 
         public Button RestartButton;
         public float ButtonAppearTime = 3f;
+
 
         void Awake()
         {
@@ -59,7 +62,29 @@ namespace ShadowShift
             yield return new WaitForSeconds(DelayTimeFor_FadeImage);
             FadeImage.GetComponent<Animator>().CrossFade("FadeOut", .1f);
             yield return new WaitForSeconds(2f);
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+
+            // here we need to decide to save the preferred data via JSON format
+
+            if (GameData.FileExists())
+            {
+                // get the data now
+                PlayerData playerData = GameData.LoadData();
+
+                // check if there are controls in it or not
+                if (playerData.Controls.Equals("Buttons") || playerData.Controls.Equals("Swipe"))
+                {
+                    m_ControlType.M_Controls = playerData.Controls == "Buttons" ? ControlType.Controls.Buttons : ControlType.Controls.Swipe;
+                    SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 2);
+                }
+                else
+                {
+                    // since no control data is found so we're loading the controls screen here
+                    SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+                }
+            }
+            else SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1); ;
+
+
         }
 
         void Enable_RestartButton() => RestartButton.gameObject.SetActive(true);
