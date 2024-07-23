@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using Random = UnityEngine.Random;
+using System.Collections.Specialized;
+using Unity.VisualScripting;
 
 namespace ShadowShift.Player
 {
@@ -214,6 +217,50 @@ namespace ShadowShift.Player
             m_anim.SetBool("IsHiding", false);
             Fade(m_playerEyeSprite, true, m_imageFadeDuration);
         }
+
+        #endregion
+
+
+        #region Enemy
+        [Header("Enemy settings")]
+
+        [SerializeField] Transform[] m_deathParticles;
+        [SerializeField] float m_force = 2f;
+
+        public void OnEnter_Enemy(Collider2D collider)
+        {
+            //m_deathParticles[0].transform.GetComponentInParent<Transform>().gameObject.SetActive(true);
+
+            // spawn a random particle as well
+            var part = EffectsController.Instance.DeathEffects[Random.Range(0, EffectsController.Instance.DeathEffects.Length)];
+            EffectsController.Instance.SpawnParticle(transform.position, part, 2f);
+
+            // Apply shake
+            CinematicsController.Instance.ApplyShake(CinematicsController.Instance.ShakeDuration);
+
+            foreach (var particle in m_deathParticles)
+            {
+                Vector2 direction = GameplayController.Instance.GetRandomDirection2D();
+                particle.AddComponent<Rigidbody2D>().AddForce(direction * m_force, ForceMode2D.Impulse);
+
+                particle.transform.SetParent(null);
+
+                // destory it after some time
+                Destroy(particle.gameObject, 1f);
+            }
+
+            // shut this player off
+            this.gameObject.SetActive(false);
+        }
+        public void OnStay_Enemy(Collider2D collider)
+        {
+
+        }
+        public void OnExit_Enemy(Collider2D collider)
+        {
+
+        }
+
 
         #endregion
 

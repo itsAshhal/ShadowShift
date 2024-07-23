@@ -32,10 +32,19 @@ namespace ShadowShift.Player
             m_controlType.M_Controls = playerData.Controls == "Buttons" ? ControlType.Controls.Buttons : ControlType.Controls.Swipe;
 
             m_canvasManager.SetUI_Buttons(m_controlType.M_Controls == ControlType.Controls.Buttons);
-            
+
 
 
         }
+
+        public Vector2 GetRandomDirection2D()
+        {
+            float angle = Random.Range(0f, 360f);
+            float radian = angle * Mathf.Deg2Rad;
+            return new Vector2(Mathf.Cos(radian), Mathf.Sin(radian));
+        }
+
+
     }
 
 }

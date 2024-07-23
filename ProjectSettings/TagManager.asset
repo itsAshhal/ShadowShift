@@ -7,6 +7,8 @@ TagManager:
   - Ground
   - Hide
   - Controls
+  - VolcanicSpikes
+  - Enemy
   layers:
   - Default
   - TransparentFX

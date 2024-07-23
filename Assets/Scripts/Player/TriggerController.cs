@@ -13,6 +13,7 @@ namespace ShadowShift.Player
         public UnityEvent<Collider2D> _OnEnter;
         public UnityEvent<Collider2D> _OnStay;
         public UnityEvent<Collider2D> _OnExit;
+        public UnityEvent<Collider2D> _OnParticleCollision;
 
         void Awake()
         {
@@ -35,6 +36,14 @@ namespace ShadowShift.Player
         {
             if (collider.CompareTag(TagToEncounter) == false) return;
             _OnExit?.Invoke(collider);
+        }
+
+        // Collision with particles
+
+        void OnParticleCollision(GameObject other)
+        {
+            if (other.CompareTag(TagToEncounter) == false) return;
+            _OnParticleCollision?.Invoke(other.GetComponent<Collider2D>());
         }
 
     }
