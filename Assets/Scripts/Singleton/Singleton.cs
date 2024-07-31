@@ -1,50 +1,64 @@
 using UnityEngine;
 
-
 namespace ShadowShift
 {
     public abstract class Singleton<T> : MonoBehaviour where T : Component
     {
         private static T _instance;
         private static object _lock = new object();
+        private static bool _isApplicationQuitting = false; // To handle edge cases during application quit
 
         public static T Instance
         {
             get
             {
-                if (_instance == null)
+                if (_isApplicationQuitting)
                 {
-                    lock (_lock)
+                    Debug.LogWarning($"Attempt to access {typeof(T).Name} after it has been destroyed.");
+                    return null;
+                }
+
+                lock (_lock)
+                {
+                    if (_instance == null)
                     {
+                        _instance = FindObjectOfType<T>();
                         if (_instance == null)
                         {
-                            // Only search for instances in the current scene to avoid potential conflicts
-                            _instance = FindObjectOfType<T>();
-
-                            if (_instance == null)
-                            {
-                                // Create a new instance only if none exists
-                                GameObject singletonGameObject = new GameObject($"{typeof(T).Name} (Singleton)");
-                                _instance = singletonGameObject.AddComponent<T>();
-                                DontDestroyOnLoad(singletonGameObject);
-                            }
+                            Debug.Log($"Creating new instance of {typeof(T).Name}");
+                            GameObject singletonGameObject = new GameObject($"{typeof(T).Name} (Singleton)");
+                            _instance = singletonGameObject.AddComponent<T>();
                         }
                     }
                 }
-
                 return _instance;
             }
         }
 
         protected virtual void Awake()
         {
-            if (_instance != null && _instance != this)
+            if (_instance == null)
             {
-                // Handle duplicate instance gracefully, e.g., logging a warning or destroying this instance
-                Debug.LogWarning($"Duplicate instance of {typeof(T)} found! Destroying this instance.");
+                _instance = this as T;
+            }
+            else if (_instance != this)
+            {
+                Debug.Log($"Another instance of {typeof(T).Name} was created, so this instance will be destroyed.");
                 Destroy(gameObject);
             }
         }
-    }
 
+        protected virtual void OnDestroy()
+        {
+            if (_instance == this)
+            {
+                _instance = null; // Clear the static instance if this was it
+            }
+        }
+
+        protected virtual void OnApplicationQuit()
+        {
+            _isApplicationQuitting = true; // To prevent access to the singleton during shutdown
+        }
+    }
 }

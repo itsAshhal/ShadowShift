@@ -23,6 +23,13 @@ namespace ShadowShift.UI
 
         }
 
+
+       
+        public void SetObjectActiveState(GameObject go)
+        {
+            go.SetActive(!go.activeSelf);
+        }
+
         private void OnButtonClick()
         {
             AnimateButton(() =>

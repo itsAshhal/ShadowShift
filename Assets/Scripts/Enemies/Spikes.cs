@@ -17,7 +17,7 @@ namespace ShadowShift.Enemy
             m_bottomSpikeAnim = GetComponent<Animator>();
 
             m_currentStateName = m_bottomSpikeAppearAnimationStateName;
-            if (M_SpikeTypes == SpikeTypes.BottomSpike) InvokeRepeating(nameof(BottomSpikeMechanics), m_spikeAppearDuration, m_spikeAppearDuration);
+            if (M_SpikeTypes == SpikeTypes.BottomSpike) InvokeRepeating(nameof(BottomSpikeMechanics), m_startAfter, m_spikeAppearDuration);
         }
 
         #region BottomSpikes
@@ -29,6 +29,7 @@ namespace ShadowShift.Enemy
         [SerializeField] float m_spikeAppearDuration = 1f;
         private string m_currentStateName = string.Empty;
         private Animator m_bottomSpikeAnim;
+        [SerializeField] float m_startAfter = 1f;
 
 
 

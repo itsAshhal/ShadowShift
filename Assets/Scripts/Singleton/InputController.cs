@@ -13,7 +13,7 @@ namespace ShadowShift
     /// Main class for handling input controls, both
     /// for SWIPE and BUTTONS
     /// </summary>
-    public class InputController : Singleton<InputController>
+    public class InputController : MonoBehaviour
     {
 
         public Action<Touch> OnPressJump;
@@ -33,6 +33,17 @@ namespace ShadowShift
         public PlayerMovement M_PlayerMovement;
         [Tooltip("If the finger after touched moves farther than this point either left or right, then the movement is registered")]
         [SerializeField] float m_touchMovementThreshold = .1f;
+
+
+        public static InputController Instance;
+        private void Awake()
+        {
+            if (Instance != this && Instance != null)
+            {
+                Destroy(this);
+            }
+            else Instance = this;
+        }
 
         void Start()
         {
@@ -150,7 +161,7 @@ namespace ShadowShift
         {
             // first make sure that are we touching a UI element or just the simple screen space
             //if (!IsTouchOverUIWithTag(ControlsTag)) return;
-
+            if (GameplayController.Instance.M_GameplayState == GameplayState.Off) return;
 
             if (GameplayController.Instance == null) return;
             if (GameplayController.Instance.M_ControlType.M_Controls == ControlType.Controls.Swipe)

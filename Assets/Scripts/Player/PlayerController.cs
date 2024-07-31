@@ -6,6 +6,7 @@ using DG.Tweening;
 using Random = UnityEngine.Random;
 using System.Collections.Specialized;
 using Unity.VisualScripting;
+using UnityEngine.SceneManagement;
 
 namespace ShadowShift.Player
 {
@@ -23,12 +24,26 @@ namespace ShadowShift.Player
         [SerializeField] Animator m_anim;  // this is the main object, the black player as the child of this controller
         private Quaternion m_originalRotation;
 
+        public enum PlayerHiddenState
+        {
+            Open, Hidden
+        }
+        public PlayerHiddenState M_PlayerHiddenState;
+
+
+
         #region Unity
         void Awake()
+        {
+
+        }
+
+        private void Start()
         {
             //M_PlayerMovement = PlayerMovement.None;
             m_rb = GetComponent<Rigidbody2D>();
             //m_anim = GetComponent<Animator>();
+
 
             // setting up input controls with actions
             InputController.Instance.OnMoveRight += OnMovePlayerRight;
@@ -207,6 +222,7 @@ namespace ShadowShift.Player
         {
             m_anim.SetBool("IsHiding", true);
             Fade(m_playerEyeSprite, false, m_imageFadeDuration);
+            M_PlayerHiddenState = PlayerHiddenState.Hidden;
         }
         public void OnStay_Hide(Collider2D collider)
         {
@@ -216,6 +232,7 @@ namespace ShadowShift.Player
         {
             m_anim.SetBool("IsHiding", false);
             Fade(m_playerEyeSprite, true, m_imageFadeDuration);
+            M_PlayerHiddenState = PlayerHiddenState.Open;
         }
 
         #endregion
@@ -267,6 +284,22 @@ namespace ShadowShift.Player
         #endregion
 
 
+
+        private void OnDisable()
+        {
+            Debug.Log("Player Disabled");
+            Invoke(nameof(RestartScene), 3f);
+            Invoke(nameof(DoFade), 1.5f);
+        }
+
+        void DoFade()
+        {
+            GameplayController.Instance.M_CanvasManager.FadeImage.GetComponent<Animator>().CrossFade("FadeIn", .1f);
+        }
+        void RestartScene()
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
 
     }
 }

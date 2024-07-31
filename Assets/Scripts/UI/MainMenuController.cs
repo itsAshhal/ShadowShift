@@ -30,7 +30,7 @@ namespace ShadowShift.UI
         IEnumerator FadeCoroutine()
         {
             yield return new WaitForSeconds(m_fadingStartDuration);
-            m_fadeImage.GetComponent<Animator>().CrossFade("FadeIn", .1f);
+            m_fadeImage.GetComponent<Animator>().CrossFade("FadeOut", .1f);
         }
 
 
@@ -42,7 +42,12 @@ namespace ShadowShift.UI
             m_controlType.M_Controls = controlString == "Buttons" ? ControlType.Controls.Buttons : ControlType.Controls.Swipe;
 
             // now save to local file as well
-            GameData.SaveData(new PlayerData { Controls = m_controlType.M_Controls.ToString() });
+            GameData.SaveData(new PlayerData {
+                Controls = m_controlType.M_Controls.ToString(),
+                Stage = playerData.Stage ,
+                CameraOrthoSize = playerData.CameraOrthoSize,
+                CameraHeight = playerData.CameraHeight
+            });
 
             Debug.Log($"NewData is saved to {m_controlType.M_Controls.ToString()}");
 

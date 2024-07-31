@@ -9,7 +9,7 @@ namespace ShadowShift
     {
         Low, Medium, High
     }
-    public class CinematicsController : Singleton<CinematicsController>
+    public class CinematicsController : MonoBehaviour
     {
         public CinemachineVirtualCamera MainCamera;
         public float M_AmplitudeLow = 1f;
@@ -18,6 +18,16 @@ namespace ShadowShift
         public float M_Frequency = 3f;
         public float ShakeDuration = .25f;
         public ShakeLevel M_ShakeLevel;
+
+        public static CinematicsController Instance;
+        private void Awake()
+        {
+            if (Instance != this && Instance != null)
+            {
+                Destroy(this);
+            }
+            else Instance = this;
+        }
         public void ApplyShake(float duration)
         {
             StartCoroutine(ShakeCoroutine(duration));
