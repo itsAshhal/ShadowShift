@@ -348,7 +348,7 @@ MonoBehaviour:
   m_leftEarAnim: {fileID: 4761016551760793060}
   m_rightEarAnim: {fileID: 1040695243893820194}
   m_totalAlertAnimations: 1
-  m_shootingBallsRate: 0.1
+  m_shootingBallsRate: 2
 --- !u!1 &2253065085231647159
 GameObject:
   m_ObjectHideFlags: 0

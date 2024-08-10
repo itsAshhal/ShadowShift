@@ -8,8 +8,10 @@ using UnityEngine.UI;
 
 namespace ShadowShift.UI
 {
-    public class MainMenuController : Singleton<MainMenuController>
+    public class MainMenuController : MonoBehaviour
     {
+        public static MainMenuController Instance;
+
         [SerializeField] Image m_fadeImage;
         [SerializeField] float m_fadingStartDuration;
         [SerializeField] ControlType m_controlType;
@@ -18,6 +20,14 @@ namespace ShadowShift.UI
         [SerializeField] Vector2 m_deselectedScaling;
         [SerializeField] float m_scalingDuration;
         public UnityEvent m_startActions;
+        public AudioSource MusicAudio;
+
+        private void Awake()
+        {
+            if (Instance != this && Instance != null) Destroy(this);
+            else Instance = this;
+        }
+
         void Start()
         {
             StartCoroutine(FadeCoroutine());
@@ -25,6 +35,11 @@ namespace ShadowShift.UI
 
             if (GameData.LoadData().Controls == "Buttons") ChangeControls("Buttons");
             else ChangeControls("Swipe");
+
+
+            // Loading music data
+            LoadMusicValue();
+
         }
 
         IEnumerator FadeCoroutine()
@@ -33,6 +48,13 @@ namespace ShadowShift.UI
             m_fadeImage.GetComponent<Animator>().CrossFade("FadeOut", .1f);
         }
 
+        public void LoadMusicValue()
+        {
+            var musicValue = GameData.LoadData().MusicValue;
+            Debug.Log($"music value obtained is {musicValue}");
+            m_mainMenuCanvas.MusicSlider.value = musicValue;
+            MusicAudio.volume = musicValue;
+        }
 
 
         public void ChangeControls(string controlString)
@@ -42,11 +64,13 @@ namespace ShadowShift.UI
             m_controlType.M_Controls = controlString == "Buttons" ? ControlType.Controls.Buttons : ControlType.Controls.Swipe;
 
             // now save to local file as well
-            GameData.SaveData(new PlayerData {
+            GameData.SaveData(new PlayerData
+            {
                 Controls = m_controlType.M_Controls.ToString(),
-                Stage = playerData.Stage ,
+                Stage = playerData.Stage,
                 CameraOrthoSize = playerData.CameraOrthoSize,
-                CameraHeight = playerData.CameraHeight
+                CameraHeight = playerData.CameraHeight,
+                MusicValue = playerData.MusicValue
             });
 
             Debug.Log($"NewData is saved to {m_controlType.M_Controls.ToString()}");

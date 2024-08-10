@@ -42,7 +42,7 @@ namespace ShadowShift
         {
             // turning on FadeImage
             FadeImage.SetActive(true);
-            FadeImage.GetComponent<Animator>().CrossFade("FadeIn", .1f);
+            FadeImage.GetComponent<Animator>().CrossFade("FadeOut", .1f);
             yield return new WaitForSeconds(StartTimeForFading);
 
             Invoke(nameof(Enable_DotTrails), DelayTimeFor_Dot);
@@ -60,7 +60,7 @@ namespace ShadowShift
             });
 
             yield return new WaitForSeconds(DelayTimeFor_FadeImage);
-            FadeImage.GetComponent<Animator>().CrossFade("FadeOut", .1f);
+            FadeImage.GetComponent<Animator>().CrossFade("FadeIn", .1f);
             yield return new WaitForSeconds(2f);
 
             // here we need to decide to save the preferred data via JSON format

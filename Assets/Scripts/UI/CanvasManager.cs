@@ -52,7 +52,8 @@ namespace ShadowShift.UI
                 Stage = loadedData.Stage,
                 Controls = loadedData.Controls,
                 CameraOrthoSize = loadedData.CameraOrthoSize,
-                CameraHeight = transposer.m_TrackedObjectOffset.y
+                CameraHeight = transposer.m_TrackedObjectOffset.y,
+                MusicValue = loadedData.MusicValue
             });
 
         }
@@ -78,7 +79,8 @@ namespace ShadowShift.UI
                 Stage = loadedData.Stage,
                 Controls = loadedData.Controls,
                 CameraOrthoSize = camera.m_Lens.OrthographicSize,
-                CameraHeight = loadedData.CameraHeight
+                CameraHeight = loadedData.CameraHeight,
+                MusicValue = loadedData.MusicValue
             });
         }
 

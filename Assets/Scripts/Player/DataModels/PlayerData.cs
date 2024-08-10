@@ -12,6 +12,7 @@ namespace ShadowShift.DataModels
         public int Stage = 0;
         public float CameraOrthoSize = 10.0f;
         public float CameraHeight = 3.0f;
+        public float MusicValue = .25f;
     }
 
 
