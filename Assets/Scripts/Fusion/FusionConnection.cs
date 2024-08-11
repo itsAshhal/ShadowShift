@@ -8,6 +8,7 @@ using System;
 using static Cinemachine.CinemachineTriggerAction.ActionSettings;
 using ShadowShift.DataModels;
 using static Unity.Collections.Unicode;
+using Fusion = Fusion;
 
 namespace ShadowShift.Fusion
 {
@@ -18,12 +19,17 @@ namespace ShadowShift.Fusion
         public NetworkRunner M_NetworkRunner => m_networkRunner;
         public int HostSceneIndex = 1;
         [SerializeField] NetworkPrefabRef m_playerNetworkPrefab;
-        [SerializeField] Transform[] m_spawnPositions;
-
-        Dictionary<PlayerRef, NetworkPrefabRef> m_spawnedCharacters = new Dictionary<PlayerRef, NetworkPrefabRef>();
+        public Action OnMoveRight;
+        public Action OnMoveLeft;
+        public Action OnStop;
 
         [Networked]
-        public NetworkString<_32> Nickname;
+        public int TotalVotes { get; set; }
+
+
+        Dictionary<PlayerRef, NetworkObject> m_spawnedCharacters = new Dictionary<PlayerRef, NetworkObject>();
+
+
 
 
         private void Awake()
@@ -36,6 +42,8 @@ namespace ShadowShift.Fusion
         private void Start()
         {
             m_networkRunner = GetComponent<NetworkRunner>();
+
+            if (m_networkRunner.IsServer) TotalVotes = 0;
         }
 
         public void HostGame(string sessionName, string nickName, int maxPlayers)
@@ -55,7 +63,7 @@ namespace ShadowShift.Fusion
         /// <param name="gameMode">What kind of game mode do u want for this game</param>
         async void CreateOnlineGame(GameMode gameMode, string sessionName, string nickName, int maxPlayers)
         {
-            Nickname = nickName;
+
 
             Debug.Log($"HostMode is {gameMode}");
             var sceneInfo = new NetworkSceneInfo();
@@ -73,10 +81,12 @@ namespace ShadowShift.Fusion
                     PlayerCount = maxPlayers
                 }); ;
 
+
+
         }
         async void JoinOnlineGame(GameMode gameMode, string sessionName, string nickName)
         {
-            Nickname = nickName;
+
             var sceneInfo = new NetworkSceneInfo();
             m_networkRunner.ProvideInput = true;
             var scene = SceneRef.FromIndex(HostSceneIndex);
@@ -89,10 +99,13 @@ namespace ShadowShift.Fusion
                       SessionName = sessionName,
                       Scene = scene,
                       SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>(),
+
                   });
 
             if (joiningResult.Ok) Debug.Log($"Joined successfully");
             else Debug.Log($"Joining failed");
+
+
         }
 
         #region INetworkRunnercallbacks
@@ -114,6 +127,11 @@ namespace ShadowShift.Fusion
             {
                 if (LobbyManager.Instance == null) return;
                 Debug.Log($"A new player has joined and the LobbyManager exists");
+
+                int currentSpawnIndex = m_spawnedCharacters.Count;  // so if the spawned players are 0, first the host is spawned at 0 index of the transform
+                // then the disctionary gets filled so the next index will be 1 and so on....
+                NetworkObject networkPlayerObject = runner.Spawn(m_playerNetworkPrefab, LobbyManager.Instance.SpawnPositions[currentSpawnIndex].position, Quaternion.identity, player);
+                m_spawnedCharacters.Add(player, networkPlayerObject);
             }
         }
 
@@ -124,7 +142,26 @@ namespace ShadowShift.Fusion
 
         public void OnInput(NetworkRunner runner, NetworkInput input)
         {
+            if (LobbyInputController.Instance == null) return;
 
+            var data = new LobbyNetworkInputData();
+
+            Debug.Log($"OnInput working");
+
+            if (LobbyInputController.Instance.M_DirectionState == LobbyInputController.DirectionState.Right)
+            {
+                data.direction += Vector2.right;
+            }
+            else if (LobbyInputController.Instance.M_DirectionState == LobbyInputController.DirectionState.Left)
+            {
+                data.direction += Vector2.left;
+            }
+            else
+            {
+                data.direction = Vector2.zero;
+            }
+
+            input.Set(data);  // passing the input to host
         }
 
         public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input)

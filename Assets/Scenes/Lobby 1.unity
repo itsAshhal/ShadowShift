@@ -3846,7 +3846,6 @@ MonoBehaviour:
   ClientMessageContainer: {fileID: 1432427525}
   HostLessVotesMessageContainer: {fileID: 1243616191}
   TotalVotesText: {fileID: 346959563}
-  GameplaySceneIndex: 5
 --- !u!1 &1892210372
 GameObject:
   m_ObjectHideFlags: 0
