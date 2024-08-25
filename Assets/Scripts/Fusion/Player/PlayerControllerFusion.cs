@@ -1,14 +1,10 @@
-using ShadowShift.Player;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using DG.Tweening;
 using Fusion;
 using System;
-using UnityEngine.UI;
+using Cinemachine;
 using TMPro;
+using System.Collections;
 
 namespace ShadowShift.Fusion
 {
@@ -20,12 +16,17 @@ namespace ShadowShift.Fusion
         [SerializeField] float m_rotationSpeed = 2f;
         public bool m_canJump = true;
         public Quaternion CustomRotation;
+        [Tooltip("Unparent this vcam on start after checking the input authority")]
+        [SerializeField] CinemachineVirtualCamera m_playerVcam;
+        [SerializeField] TMP_Text m_nicknameText;
 
 
         [Networked]
         public Color SpriteColor { get; set; }
         [Networked]
         public int TotalVotes { get; set; }
+        [Networked]
+        public string nickName { get; set; }
 
         private bool m_canVote = true;
 
@@ -59,6 +60,23 @@ namespace ShadowShift.Fusion
             //m_anim = GetComponent<Animator>();
 
 
+            // unparenting the cinemachine vcam
+            m_playerVcam.transform.SetParent(null);
+
+            // ok so lets try a trick, if the player doesn't have the input authority, then destroy the camera
+            if (!HasInputAuthority) Destroy(m_playerVcam.gameObject);
+
+            //AnimatePlayerNickname();
+
+            // bind this function to OnPlayerJoined callback of the FusionConnection
+            if (HasInputAuthority)
+            {
+                if (FusionConnection.Instance != null)
+                {
+                    FusionConnection.Instance._OnPlayerJoined += this.AnimatePlayerViaFusionSync;
+                }
+
+            }
 
 
             m_originalRotation = transform.rotation;
@@ -71,7 +89,65 @@ namespace ShadowShift.Fusion
             // we need to bind actions to detect the vote changes
             LobbyManager.Instance.OnChangeVote += OnVoteChanged;
 
+            // check if we're the host so we can start the gameplay with the lobby canvas UI animations
+            if (Lobby_UI.Instance == null) return;
+
+            Debug.Log($"OnClickStartGameByHost is binded");
+            LobbyManager.Instance.OnClickStartGameByHost += this.OnGameStartByHost;
+
         }
+
+
+        /// <summary>
+        /// This function will be called when someone joins but here on each client which makes it easier to update things when new clients come up
+        /// </summary>
+        /// <param name="runner">The runner which has joined</param>
+        /// <param name="player">player ref of the runner that has joined</param>
+        public void AnimatePlayerViaFusionSync(NetworkRunner runner, PlayerRef player)
+        {
+            // whenever a new player joins, this callback will be used and called so it will update the nicknames on the player
+            Debug.Log($"PlayerNickname Syncing is called");
+
+            // lets try changing the nicknames via the networked proerties this time and see what happens
+            //AnimatePlayerNickname();
+
+            // lets try a different method, use InvokeRepeating for atleast next 5 seconds to keep others updated
+            StartCoroutine(AnimatePlayerNicknameCoroutine());
+
+            //AnimatePlayerNickname();
+        }
+
+        IEnumerator AnimatePlayerNicknameCoroutine()
+        {
+            for (int i = 1; i <= 5; i++)
+            {
+                yield return new WaitForSeconds(1f);
+                AnimatePlayerNickname();
+            }
+        }
+
+        public void AnimatePlayerNickname()
+        {
+            // lets first test if its working on local devices or not
+            if (HasInputAuthority == false) return;
+            RPC_ChangeNicknameOnServer(FusionConnection.Instance.Nickname);
+
+        }
+
+        [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority, HostMode = RpcHostMode.SourceIsHostPlayer)]
+        public void RPC_ChangeNicknameOnServer(string nickname, RpcInfo info = default)
+        {
+            RPC_ChangeNicknameOnClients(nickname);
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
+        public void RPC_ChangeNicknameOnClients(string nickname)
+        {
+            var anim = m_nicknameText.GetComponent<Animator>();
+            m_nicknameText.text = nickname;
+            anim.CrossFade("Appear", .1f);
+        }
+
 
         public override void FixedUpdateNetwork()
         {
@@ -79,6 +155,8 @@ namespace ShadowShift.Fusion
             //transform.rotation = CustomRotation;
 
             Debug.Log($"My input authority is {HasInputAuthority}");
+
+
 
             try
             {
@@ -123,6 +201,33 @@ namespace ShadowShift.Fusion
             Debug.Log($"Rotating Left {transform.rotation.eulerAngles}");
         }
 
+
+        public void OnGameStartByHost()
+        {
+            // now call RPCs so we can animate the UI on all the clients and start the actual gameplay
+            Debug.Log($"OnClickStartGameByHost RPC server called");
+            if (Runner.IsServer == false) return;
+            RPC_StartGameOnServer();
+        }
+        [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority, HostMode = RpcHostMode.SourceIsHostPlayer)]
+        public void RPC_StartGameOnServer(RpcInfo info = default)
+        {
+            // call the RPC for clients
+            RPC_StartGameOnClients();
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
+        public void RPC_StartGameOnClients()
+        {
+            Debug.Log($"RPC start game called on all clients");
+            // use the Lobby UI to animate the UI
+            Lobby_UI.Instance.RemoveLobbyUI();
+
+            // since this RPC is working on all the clients, make a smooth transition from the camera as well
+            LobbyManager.Instance.LobbyCamera.Priority = 5; // make sure to set it to 11 in the editor
+        }
+
+
         public void OnVoteChanged()
         {
             // we need to check if we can still vote or not, as we can't just keep on voting infinitely
@@ -156,6 +261,7 @@ namespace ShadowShift.Fusion
 
             Debug.Log($"TotalVotes are {TotalVotes}");
         }
+
 
 
         public void OnPlayerSpriteColorChange(Color color)

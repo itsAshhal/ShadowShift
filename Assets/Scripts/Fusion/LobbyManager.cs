@@ -1,3 +1,4 @@
+using Cinemachine;
 using Fusion;
 using System;
 using System.Collections;
@@ -15,11 +16,13 @@ namespace ShadowShift.Fusion
         public static LobbyManager Instance;
         public Transform[] SpawnPositions;
         public Action<Color> OnColorPaletterChange;
+        public Action OnClickStartGameByHost;
         public Action OnChangeVote;
         public Animator ClientMessageContainer;
         public Animator HostLessVotesMessageContainer;
         public TMP_Text TotalVotesText;
         public int GameplaySceneIndex = 4;
+        public CinemachineVirtualCamera LobbyCamera;
 
         private void Awake()
         {
@@ -91,13 +94,17 @@ namespace ShadowShift.Fusion
                     else
                     {
                         // here the host needs to change the scene so all other clients can change the scene as well
-                        var sceneInfo = new NetworkSceneInfo();
+                        /*var sceneInfo = new NetworkSceneInfo();
                         var sceneRef = SceneRef.FromIndex(GameplaySceneIndex);
                         sceneInfo.AddSceneRef(sceneRef, UnityEngine.SceneManagement.LoadSceneMode.Single);
                         FusionConnection.Instance.M_NetworkRunner.SceneManager.LoadScene(sceneRef, new NetworkLoadSceneParameters
                         {
 
-                        });
+                        });*/
+
+                        // Instead of changing the scene, lets play the game in the same scene and change just change the UI, of course and the vcams as well
+                        Debug.Log($"The gams has started by the host");
+                        OnClickStartGameByHost?.Invoke();
                     }
                     break;
             }

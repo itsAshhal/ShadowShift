@@ -22,6 +22,8 @@ namespace ShadowShift.Fusion
         public Action OnMoveRight;
         public Action OnMoveLeft;
         public Action OnStop;
+        public Action<NetworkRunner, PlayerRef> _OnPlayerJoined;
+        public string Nickname;
 
         [Networked]
         public int TotalVotes { get; set; }
@@ -64,7 +66,7 @@ namespace ShadowShift.Fusion
         async void CreateOnlineGame(GameMode gameMode, string sessionName, string nickName, int maxPlayers)
         {
 
-
+            this.Nickname = nickName;
             Debug.Log($"HostMode is {gameMode}");
             var sceneInfo = new NetworkSceneInfo();
             m_networkRunner.ProvideInput = true;
@@ -86,7 +88,7 @@ namespace ShadowShift.Fusion
         }
         async void JoinOnlineGame(GameMode gameMode, string sessionName, string nickName)
         {
-
+            this.Nickname = nickName;
             var sceneInfo = new NetworkSceneInfo();
             m_networkRunner.ProvideInput = true;
             var scene = SceneRef.FromIndex(HostSceneIndex);
@@ -128,16 +130,40 @@ namespace ShadowShift.Fusion
                 if (LobbyManager.Instance == null) return;
                 Debug.Log($"A new player has joined and the LobbyManager exists");
 
+                // we need to call this action on each client so we get the latest updates
+                _OnPlayerJoined?.Invoke(runner, player);
+
                 int currentSpawnIndex = m_spawnedCharacters.Count;  // so if the spawned players are 0, first the host is spawned at 0 index of the transform
                 // then the disctionary gets filled so the next index will be 1 and so on....
                 NetworkObject networkPlayerObject = runner.Spawn(m_playerNetworkPrefab, LobbyManager.Instance.SpawnPositions[currentSpawnIndex].position, Quaternion.identity, player);
                 m_spawnedCharacters.Add(player, networkPlayerObject);
+
+                // lets try calling it manually on each player when spawning it
+                networkPlayerObject.GetComponent<PlayerControllerFusion>().AnimatePlayerViaFusionSync(runner, player);
+
+                _OnPlayerJoined?.Invoke(runner, player);
             }
+            else
+            {
+                Debug.Log($"Hi there you've just joined a new room as a localClient");
+                _OnPlayerJoined?.Invoke(runner, player);
+            }
+
+            // we need to call this action on each client so we get the latest updates
+            // lets try calling it manually on each player when spawning it
+            //_OnPlayerJoined?.Invoke(runner, player);
+
         }
 
         public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
         {
-
+            // when the player leaves we need to despawn the player from the server and also remove it from the dictionary
+            if (m_spawnedCharacters.TryGetValue(player, out NetworkObject networkObject))
+            {
+                // remove it then
+                runner.Despawn(networkObject);
+                m_spawnedCharacters.Remove(player);
+            }
         }
 
         public void OnInput(NetworkRunner runner, NetworkInput input)
