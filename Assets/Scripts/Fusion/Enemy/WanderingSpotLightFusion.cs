@@ -22,38 +22,54 @@ namespace ShadowShift.Fusion
         public float WanderingSpeed = 2f;
         private Transform _currentWanderingTransform;
         public float DistanceReachThreshold = .1f;
+        [Tooltip("When the enemy catches sight of any of the player in the room, it chases it with a little increased speed")]
+        public float ChaseSpeed = 5.0f;
+
 
         private void Awake()
         {
+
+        }
+
+        private void Start()
+        {
+            if (HasInputAuthority == false) return;
             Debug.Log($"The enemy has been awakened in the multiplayer");
             _currentWanderingTransform = LeftWanderingTransform;
+            _currentTarget = null;
+            LeftWanderingTransform.SetParent(null);
+            RightWanderingTransform.SetParent(null);
         }
 
         public override void FixedUpdateNetwork()
         {
-            if (_currentTarget == null)
-            {
-                // if there is no target to follow we simply need the enemy to keep wandering here and there
-                Vector2.MoveTowards(transform.position, _currentWanderingTransform.position, WanderingSpeed * Runner.DeltaTime);
+            if (HasInputAuthority == false) return;
+            Debug.Log($"Enemy has input authority so its moving");
+            // Move the enemy
+            if (_currentTarget == null) MoveEnemyRandom();
+            else MoveEnemyTowardsPlayer();
 
-                // check if the distance is reached
-                float remainingDistance = Vector2.Distance(transform.position, _currentWanderingTransform.position);
-                bool isReached = remainingDistance <= DistanceReachThreshold;
 
-                if (isReached)
-                {
-                    // change the current wandering transform
-                    _currentWanderingTransform = _currentWanderingTransform == LeftWanderingTransform ? RightWanderingTransform : LeftWanderingTransform;
-                }
-                else
-                {
-                    return;
-                }
-            }
-            else
+
+
+        }
+
+        void MoveEnemyRandom()
+        {
+            if (_currentWanderingTransform == null) return;
+            transform.position = Vector2.MoveTowards(transform.position, _currentWanderingTransform.position, WanderingSpeed * Runner.DeltaTime);
+
+            // check if the currentTargetTransform has been reached?
+            if (Vector2.Distance(transform.position, _currentWanderingTransform.position) <= DistanceReachThreshold)
             {
-                // we need to chase the player
+                _currentWanderingTransform = _currentWanderingTransform == LeftWanderingTransform ? RightWanderingTransform : LeftWanderingTransform;
             }
+        }
+        void MoveEnemyTowardsPlayer()
+        {
+            Vector2 targetModifiedPosition = new Vector2(_currentTarget.position.x, transform.position.y);
+            transform.position = Vector2.MoveTowards(transform.position, targetModifiedPosition, ChaseSpeed * Runner.DeltaTime);
+
         }
 
 
@@ -61,7 +77,24 @@ namespace ShadowShift.Fusion
 
         public void OnTriggerEnter_SpotLight(Collider2D collider)
         {
+
+            collider.gameObject.TryGetComponent<PlayerControllerFusion>(out PlayerControllerFusion controller);
+            Debug.Log($"Major Test, got the Player Fusion Controller");
+            if (controller == null) return;
+            Debug.Log($"Major Test, got the Player Fusion Controller 2");
+            if (controller.M_PlayerHiddenState == PlayerControllerFusion.PlayerHiddenState.Hidden) return;
+            Debug.Log($"Major Test, Just entered but the HiddenState is Open");
+
             _currentTarget = collider.transform;
+
+            // lets try and shoot a ball first
+            if (FusionConnection.Instance == null) return;
+
+            // Call the shoot method from the FusionConnection
+            FusionConnection.Instance.SpawnShootingParticle(this.transform.position, _currentTarget.position);
+
+
+            // lets try using an RPC
         }
         public void OnTriggerStay_SpotLight(Collider2D collider)
         {
@@ -70,7 +103,13 @@ namespace ShadowShift.Fusion
         public void OnTriggerExit_SpotLight(Collider2D collider)
         {
             _currentTarget = null;
+
         }
+
+        #endregion
+
+        #region RPC_s
+
 
         #endregion
 

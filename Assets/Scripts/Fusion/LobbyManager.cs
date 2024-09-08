@@ -1,5 +1,6 @@
 using Cinemachine;
 using Fusion;
+using JetBrains.Annotations;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -15,7 +16,12 @@ namespace ShadowShift.Fusion
     {
         public static LobbyManager Instance;
         public Transform[] SpawnPositions;
+        [Tooltip("Totally depends on the no. of transforms we use, enemies will be of that amount")]
+        public Transform[] WanderingEnemySpotlightSpawnPositions;
         public Action<Color> OnColorPaletterChange;
+        /// <summary>
+        /// This event triggers the actual start of the gameplay after checking if total votes == current players in the room
+        /// </summary>
         public Action OnClickStartGameByHost;
         public Action OnChangeVote;
         public Animator ClientMessageContainer;
@@ -23,6 +29,8 @@ namespace ShadowShift.Fusion
         public TMP_Text TotalVotesText;
         public int GameplaySceneIndex = 4;
         public CinemachineVirtualCamera LobbyCamera;
+        [Tooltip("We need to remove these lobby boundaries as well when the game starts")]
+        public Animator[] LobbyBoundaries;
 
         private void Awake()
         {
@@ -120,8 +128,13 @@ namespace ShadowShift.Fusion
         }
 
 
-
-
+/// <summary>
+/// Remove the boundaries of the lobby when the game starts so player can move freely and enjoy the actual game
+/// </summary>
+        public void RemoveLobbyBoundaries()
+        {
+            foreach (var anim in LobbyBoundaries) anim.CrossFade("Disappear", .1f);
+        }
 
     }
 }

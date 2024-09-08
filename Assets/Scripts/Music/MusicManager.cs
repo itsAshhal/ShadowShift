@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace ShadowShift.Music
 {
@@ -11,6 +12,8 @@ namespace ShadowShift.Music
 
         void Awake()
         {
+
+
             if (instance == null)
             {
                 instance = this;
@@ -19,6 +22,20 @@ namespace ShadowShift.Music
             else if (instance != this)
             {
                 Destroy(gameObject);
+            }
+        }
+
+        private void Start()
+        {
+            Debug.Log($"Start function is called on MusicManager");
+            // searching for the multiplayer lobby scene so we can chnage the music
+            Scene scene = SceneManager.GetSceneByName("Lobby");
+            int referenceSceneIndex = scene.buildIndex;
+
+            if (SceneManager.GetActiveScene().buildIndex == referenceSceneIndex)
+            {
+                // it means we're at the lobby scene and we don't need the old music
+                Destroy(this.gameObject);
             }
         }
     }

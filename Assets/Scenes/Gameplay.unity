@@ -768,9 +768,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2103867302}
     - target: {fileID: 6668595890409967293, guid: 1763eb6a1665a4549ad0b5c1d3745081, type: 3}
+      propertyPath: m_allStages.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 6668595890409967293, guid: 1763eb6a1665a4549ad0b5c1d3745081, type: 3}
       propertyPath: m_allStages.Array.data[2]
       value: 
       objectReference: {fileID: 51292383215895362, guid: 38fadc95357790643aee67bda5c3f33a, type: 3}
+    - target: {fileID: 6668595890409967293, guid: 1763eb6a1665a4549ad0b5c1d3745081, type: 3}
+      propertyPath: m_allStages.Array.data[3]
+      value: 
+      objectReference: {fileID: 51292383215895362, guid: 2587f025ab191f149a8aaf71c36016b7, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

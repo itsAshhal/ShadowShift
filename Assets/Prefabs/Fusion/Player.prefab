@@ -675,7 +675,7 @@ Transform:
   m_GameObject: {fileID: 832550261050371920}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 3, z: -10}
+  m_LocalPosition: {x: 0, y: 7.5600004, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -704,7 +704,7 @@ MonoBehaviour:
   m_Follow: {fileID: 7080746746068349322}
   m_Lens:
     FieldOfView: 86.78
-    OrthographicSize: 5.37
+    OrthographicSize: 9.88
     NearClipPlane: 0.3
     FarClipPlane: 1000
     Dutch: 0
@@ -1493,7 +1493,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_moveSpeed: 436
-  m_jumpSpeed: 18.2
+  m_jumpSpeed: 900
   m_playerCanRotateWhenNotTouchingTheGound: 0
   m_rotationSpeed: 1437.5
   m_canJump: 1
@@ -1502,6 +1502,7 @@ MonoBehaviour:
   m_nicknameText: {fileID: 3515503571260554506}
   _SpriteColor: {r: 0, g: 0, b: 0, a: 0}
   _TotalVotes: 0
+  _nickName: 
   m_anim: {fileID: 8978990192195544315}
   M_PlayerHiddenState: 0
   m_groundLayermask:
@@ -2236,8 +2237,8 @@ MonoBehaviour:
   _OnEnter:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: ShadowShift.Player.PlayerController, Assembly-CSharp
+      - m_Target: {fileID: 2115421532379546077}
+        m_TargetAssemblyTypeName: ShadowShift.Fusion.PlayerControllerFusion, Assembly-CSharp
         m_MethodName: OnEnterGround
         m_Mode: 0
         m_Arguments:
@@ -2251,7 +2252,7 @@ MonoBehaviour:
   _OnStay:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 2753684083327211040}
         m_TargetAssemblyTypeName: ShadowShift.Player.PlayerController, Assembly-CSharp
         m_MethodName: OnStayGround
         m_Mode: 0
@@ -2266,8 +2267,8 @@ MonoBehaviour:
   _OnExit:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: ShadowShift.Player.PlayerController, Assembly-CSharp
+      - m_Target: {fileID: 2115421532379546077}
+        m_TargetAssemblyTypeName: ShadowShift.Fusion.PlayerControllerFusion, Assembly-CSharp
         m_MethodName: OnExitGround
         m_Mode: 0
         m_Arguments:
@@ -2315,7 +2316,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3854047162546539214}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ed283908a423e8a4895fb0d058c630d2, type: 3}
   m_Name: 
@@ -2632,7 +2633,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ad980451443d70438faac0bc6c235a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_TrackedObjectOffset: {x: 0, y: 3, z: 0}
+  m_TrackedObjectOffset: {x: 0, y: 7.56, z: 0}
   m_LookaheadTime: 0
   m_LookaheadSmoothing: 0
   m_LookaheadIgnoreY: 0
@@ -3361,8 +3362,8 @@ MonoBehaviour:
   _OnEnter:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: ShadowShift.Player.PlayerController, Assembly-CSharp
+      - m_Target: {fileID: 2115421532379546077}
+        m_TargetAssemblyTypeName: ShadowShift.Fusion.PlayerControllerFusion, Assembly-CSharp
         m_MethodName: OnEnter_Hide
         m_Mode: 0
         m_Arguments:
@@ -3375,24 +3376,12 @@ MonoBehaviour:
         m_CallState: 2
   _OnStay:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: ShadowShift.Player.PlayerController, Assembly-CSharp
-        m_MethodName: OnStay_Hide
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   _OnExit:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: ShadowShift.Player.PlayerController, Assembly-CSharp
+      - m_Target: {fileID: 2115421532379546077}
+        m_TargetAssemblyTypeName: ShadowShift.Fusion.PlayerControllerFusion, Assembly-CSharp
         m_MethodName: OnExit_Hide
         m_Mode: 0
         m_Arguments:
@@ -4000,7 +3989,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 1.261}
-  m_SizeDelta: {x: 4.5591, y: 1.4367}
+  m_SizeDelta: {x: 9.6354, y: 1.4367}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!23 &2956176412015781875
 MeshRenderer:
@@ -4022,7 +4011,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 4947526003329243655, guid: 2df15a08ac697d74e9b66eb0725de399, type: 2}
+  - {fileID: 2140474, guid: 8a89fa14b10d46a99122fd4f73fca9a2, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -4064,10 +4053,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Hydra
+  m_text: ???
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 2df15a08ac697d74e9b66eb0725de399, type: 2}
-  m_sharedMaterial: {fileID: 4947526003329243655, guid: 2df15a08ac697d74e9b66eb0725de399, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8a89fa14b10d46a99122fd4f73fca9a2, type: 2}
+  m_sharedMaterial: {fileID: 2140474, guid: 8a89fa14b10d46a99122fd4f73fca9a2, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []

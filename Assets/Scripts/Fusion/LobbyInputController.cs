@@ -22,7 +22,15 @@ namespace ShadowShift.Fusion
         public DirectionState M_DirectionState;
 
         public static LobbyInputController Instance;
+
+        public enum JumpingState
+        {
+            Yes, No, None
+        }
+        public JumpingState M_JumpingState;
         [SerializeField] float m_touchMovementThreshold = .1f;
+
+        public Action OnJumpPressed;
 
         private void Awake()
         {
@@ -48,37 +56,53 @@ namespace ShadowShift.Fusion
                 Touch touch = Input.GetTouch(0); // we only need one touch
 
                 float value = Screen.width / 2;
-                if (touch.position.x > value) return;
 
-                // check touchPhases
-                if (touch.phase == TouchPhase.Began)
+                // JUMPING CONTROLS
+                if (touch.position.x > value)   // so we can't move when we touch the right part of the screen
                 {
-                    // m_touchStartPosition = touch.position;
+                    if (touch.phase == TouchPhase.Began)
+                    {
+                        M_JumpingState = JumpingState.Yes;
+                        //M_JumpingState = JumpingState.No;
+                        OnJumpPressed?.Invoke();
+                    }
+                    if (touch.phase == TouchPhase.Ended) M_JumpingState = JumpingState.No;
                 }
-                if (touch.phase == TouchPhase.Moved)
-                {
-                    Vector2 deltaPosition = touch.deltaPosition;
-                    Debug.Log($"DeltaPosition {deltaPosition}");
 
-                    if (deltaPosition.x > (0f + m_touchMovementThreshold))
-                    {
-                        // we're moving right
-                        Debug.Log($"Lobby movement, moving right");
-                        M_DirectionState = DirectionState.Right;
-                    }
-                    else if (deltaPosition.x < (0f - m_touchMovementThreshold))
-                    {
-                        // we're moving left
-                        Debug.Log($"Lobby movement, moving left");
-                        M_DirectionState = DirectionState.Left;
-                    }
-                    //else M_PlayerMovement = PlayerMovement.None;
-                }
-                if (touch.phase == TouchPhase.Ended)
+                // MOVING CONTROLS
+                if (!(touch.position.x > value))
                 {
-                    // we have stopped moving
-                    M_DirectionState = DirectionState.None;
+                    // check touchPhases
+                    if (touch.phase == TouchPhase.Began)
+                    {
+                        // m_touchStartPosition = touch.position;
+                    }
+                    if (touch.phase == TouchPhase.Moved)
+                    {
+                        Vector2 deltaPosition = touch.deltaPosition;
+                        Debug.Log($"DeltaPosition {deltaPosition}");
+
+                        if (deltaPosition.x > (0f + m_touchMovementThreshold))
+                        {
+                            // we're moving right
+                            Debug.Log($"Lobby movement, moving right");
+                            M_DirectionState = DirectionState.Right;
+                        }
+                        else if (deltaPosition.x < (0f - m_touchMovementThreshold))
+                        {
+                            // we're moving left
+                            Debug.Log($"Lobby movement, moving left");
+                            M_DirectionState = DirectionState.Left;
+                        }
+                        //else M_PlayerMovement = PlayerMovement.None;
+                    }
+                    if (touch.phase == TouchPhase.Ended)
+                    {
+                        // we have stopped moving
+                        M_DirectionState = DirectionState.None;
+                    }
                 }
+
             }
 
         }

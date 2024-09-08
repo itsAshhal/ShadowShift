@@ -86,9 +86,16 @@ public static class JsonHelper
 {
     public static T[] FromJson<T>(string json)
     {
+        if (string.IsNullOrEmpty(json))
+        {
+            Debug.LogWarning("JSON input is empty or null.");
+            return new T[0]; // Return an empty array if JSON is empty or null
+        }
+
         Wrapper<T> wrapper = JsonUtility.FromJson<Wrapper<T>>(json);
-        return wrapper.Items;
+        return wrapper?.Items ?? new T[0]; // Return the items or an empty array if wrapper is null
     }
+
 
     public static string ToJson<T>(T[] array)
     {

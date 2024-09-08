@@ -171,7 +171,7 @@ namespace ShadowShift.Player
         }
         public void OnStayGround(Collider2D collider)
         {
-            //m_canJump = true;
+            m_canJump = true;
 
             //transform.rotation = m_originalRotation;
 
@@ -223,10 +223,12 @@ namespace ShadowShift.Player
             m_anim.SetBool("IsHiding", true);
             Fade(m_playerEyeSprite, false, m_imageFadeDuration);
             M_PlayerHiddenState = PlayerHiddenState.Hidden;
+            m_canJump = true;
         }
         public void OnStay_Hide(Collider2D collider)
         {
-
+            // since the jump is having issues so we need to keep the m_canJump=true as long as we are in contact with the Hidden elements
+            m_canJump = true;
         }
         public void OnExit_Hide(Collider2D collider)
         {

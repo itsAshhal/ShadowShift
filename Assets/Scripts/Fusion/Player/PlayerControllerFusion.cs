@@ -5,6 +5,9 @@ using System;
 using Cinemachine;
 using TMPro;
 using System.Collections;
+using Random = UnityEngine.Random;
+using UnityEngine.SceneManagement;
+
 
 namespace ShadowShift.Fusion
 {
@@ -19,6 +22,8 @@ namespace ShadowShift.Fusion
         [Tooltip("Unparent this vcam on start after checking the input authority")]
         [SerializeField] CinemachineVirtualCamera m_playerVcam;
         [SerializeField] TMP_Text m_nicknameText;
+
+
 
 
         [Networked]
@@ -42,9 +47,6 @@ namespace ShadowShift.Fusion
 
 
 
-
-
-
         #region Unity
         void Awake()
         {
@@ -59,6 +61,7 @@ namespace ShadowShift.Fusion
             m_rb = GetComponent<Rigidbody2D>();
             //m_anim = GetComponent<Animator>();
 
+            m_canJump = true;
 
             // unparenting the cinemachine vcam
             m_playerVcam.transform.SetParent(null);
@@ -66,7 +69,9 @@ namespace ShadowShift.Fusion
             // ok so lets try a trick, if the player doesn't have the input authority, then destroy the camera
             if (!HasInputAuthority) Destroy(m_playerVcam.gameObject);
 
-            //AnimatePlayerNickname();
+            // Keep calling the update name method RPC so that we don't have to bother checking when someone else joins
+            InvokeRepeating(nameof(AnimatePlayerNickname), .5f, .5f);
+
 
             // bind this function to OnPlayerJoined callback of the FusionConnection
             if (HasInputAuthority)
@@ -83,6 +88,8 @@ namespace ShadowShift.Fusion
 
             if (LobbyManager.Instance == null) return;
 
+            LobbyInputController.Instance.OnJumpPressed += this.OnPlayerJump;
+
             // now we need to bind the specific function to the colorPaletter action
             LobbyManager.Instance.OnColorPaletterChange += OnPlayerSpriteColorChange;
 
@@ -94,6 +101,10 @@ namespace ShadowShift.Fusion
 
             Debug.Log($"OnClickStartGameByHost is binded");
             LobbyManager.Instance.OnClickStartGameByHost += this.OnGameStartByHost;
+
+            // Binding another function for checking if the player is about to leave the room or not
+            if (Lobby_UI.Instance == null) return;
+            Lobby_UI.Instance.LeaveRoomBtn.onClick.AddListener(OnPlayerLeaveRoom);
 
         }
 
@@ -130,23 +141,12 @@ namespace ShadowShift.Fusion
         {
             // lets first test if its working on local devices or not
             if (HasInputAuthority == false) return;
+            Debug.Log($"Animate Player Nickname is called");
             RPC_ChangeNicknameOnServer(FusionConnection.Instance.Nickname);
 
         }
 
-        [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority, HostMode = RpcHostMode.SourceIsHostPlayer)]
-        public void RPC_ChangeNicknameOnServer(string nickname, RpcInfo info = default)
-        {
-            RPC_ChangeNicknameOnClients(nickname);
-        }
 
-        [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
-        public void RPC_ChangeNicknameOnClients(string nickname)
-        {
-            var anim = m_nicknameText.GetComponent<Animator>();
-            m_nicknameText.text = nickname;
-            anim.CrossFade("Appear", .1f);
-        }
 
 
         public override void FixedUpdateNetwork()
@@ -165,7 +165,24 @@ namespace ShadowShift.Fusion
                     // normalize the direction so we can multiply it for speed
                     data.direction.Normalize();
 
-                    m_rb.velocity = m_moveSpeed * Runner.DeltaTime * data.direction;
+                    // m_rb.velocity = m_moveSpeed * Runner.DeltaTime * data.direction;
+
+                    // use the Velocity in a way so it doesn't affect the y component since we need to implement the jump separately
+                    m_rb.velocity = new Vector2(m_moveSpeed * data.direction.x * Runner.DeltaTime, m_rb.velocity.y);
+
+
+                    if (data.isJumping)
+                    {
+                        if (!m_canJump) return;
+                        Debug.Log($"Isjumping part {data.isJumping}");
+                        m_rb.velocity = new Vector2(m_rb.velocity.x, m_jumpSpeed) * Runner.DeltaTime;
+                        data.isJumping = false;
+                    }
+
+                    /*if(LobbyInputController.Instance.M_JumpingState == LobbyInputController.JumpingState.Yes)
+                    {
+                        m_rb.velocity = new Vector2(m_rb.velocity.x, m_jumpSpeed) * Runner.DeltaTime;
+                    }*/
                 }
             }
             catch (Exception e)
@@ -201,7 +218,36 @@ namespace ShadowShift.Fusion
             Debug.Log($"Rotating Left {transform.rotation.eulerAngles}");
         }
 
+        #region RPC_S
 
+        [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority, HostMode = RpcHostMode.SourceIsHostPlayer)]
+        public void RPC_HidePlayerEyeOnServer(bool isHidden)
+        {
+            RPC_HidePlayerEyeOnClient(isHidden);
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
+        public void RPC_HidePlayerEyeOnClient(bool isHidden)
+        {
+            m_anim.SetBool("IsHiding", isHidden);
+            Fade(m_playerEyeSprite, !isHidden, m_imageFadeDuration);
+            M_PlayerHiddenState = isHidden == true ? PlayerHiddenState.Hidden : PlayerHiddenState.Open;
+            //M_PlayerHiddenState = PlayerHiddenState.Hidden;
+        }
+
+        [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority, HostMode = RpcHostMode.SourceIsHostPlayer)]
+        public void RPC_ChangeNicknameOnServer(string nickname, RpcInfo info = default)
+        {
+            RPC_ChangeNicknameOnClients(nickname);
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
+        public void RPC_ChangeNicknameOnClients(string nickname)
+        {
+            var anim = m_nicknameText.GetComponent<Animator>();
+            m_nicknameText.text = nickname;
+            anim.CrossFade("Appear", .1f);
+        }
         public void OnGameStartByHost()
         {
             // now call RPCs so we can animate the UI on all the clients and start the actual gameplay
@@ -223,8 +269,29 @@ namespace ShadowShift.Fusion
             // use the Lobby UI to animate the UI
             Lobby_UI.Instance.RemoveLobbyUI();
 
+            // Enable the Gameplay UI as well
+            Lobby_UI.Instance.EnableGameplayUI(true);
+
             // since this RPC is working on all the clients, make a smooth transition from the camera as well
             LobbyManager.Instance.LobbyCamera.Priority = 5; // make sure to set it to 11 in the editor
+
+            // since this RPC is sent to everybody so we need to make sure the LobbyGameplay music is also turned on
+            if (LobbyMusicManager.Instance == null) return;
+            LobbyMusicManager.Instance.LobbyMusic(true);
+
+            // we have 2 options right now for spawning the wanderingSpotLight enemy
+
+            // either we can do this when the players are spawned, especially when the host is spawned, he just spawns the enemies as well over the internet
+            // the second approach is the spawn the enemy when the game is actually started
+
+            // first option seems good to me and lets try that out
+
+            // Shake the camera on all clients as well
+            if (LobbyCinematicsController.Instance == null) return;
+            LobbyCinematicsController.Instance.ShakeCamera_GameStart();
+
+            // Remove the boundaries as well
+            LobbyManager.Instance.RemoveLobbyBoundaries();
         }
 
 
@@ -291,13 +358,66 @@ namespace ShadowShift.Fusion
 
         #endregion
 
+        #endregion
+
         #region Control Actions
+
+
+        /// <summary>
+        /// This method is called when the player pauses the game and presses the "Leave room" button
+        /// </summary>
+
+        private void OnPlayerLeaveRoom()
+        {
+            if (HasInputAuthority == false) return;
+
+            // Start the process of leaving the room
+            StartCoroutine(LeaveRoomCoroutine());
+        }
+
+        IEnumerator LeaveRoomCoroutine()
+        {
+            Lobby_UI.Instance.LeaveRoomParent.SetActive(true);
+            Debug.Log($"Test ID 1");
+            yield return new WaitForSeconds(Random.Range(1f, 3f));
+            Debug.Log($"Test ID 2");
+
+            // simply shutdown the FusionConnection
+            FusionConnection.Instance.M_NetworkRunner.Shutdown();
+        }
+
+        // Callback when despawning
+        public override void Despawned(NetworkRunner runner, bool hasState)
+        {
+            base.Despawned(runner, hasState);
+
+
+            // Ensure that the object is properly destroyed
+            Destroy(this.gameObject);
+
+            Runner.Shutdown(false, ShutdownReason.GameIsFull);
+
+
+            // Load the main menu scene
+            UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu");
+        }
+
+        [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority, HostMode = RpcHostMode.SourceIsHostPlayer)]
+        public void RPC_DisconnectOnServer(PlayerRef player)
+        {
+            FusionConnection.Instance.M_NetworkRunner.Disconnect(player);
+        }
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All, HostMode = RpcHostMode.SourceIsServer)]
+        public void RPC_DisconnectOnClient()
+        {
+
+        }
 
         private void OnPlayerJump()
         {
-            Debug.Log($"Actions working");
-            if (m_canJump == false) return;
-            m_rb.velocity = new Vector2(m_rb.velocity.x, m_jumpSpeed);
+            return;
+            if (HasInputAuthority == false) return;
+            m_rb.velocity = new Vector2(m_rb.velocity.x, m_jumpSpeed) * Runner.DeltaTime;
         }
 
         private void OnMovePlayerNoWhere()
@@ -325,16 +445,17 @@ namespace ShadowShift.Fusion
         [Header("Ground settings")]
         [SerializeField] LayerMask m_groundLayermask;
 
+
         public void OnEnterGround(Collider2D collider)
         {
-
+            m_canJump = true;
         }
         public void OnStayGround(Collider2D collider)
         {
         }
         public void OnExitGround(Collider2D collider)
         {
-
+            m_canJump = false;
         }
 
         #endregion
@@ -343,6 +464,7 @@ namespace ShadowShift.Fusion
         #region Hide
         [Header("Hide settings")]
         [SerializeField] float m_imageFadeDuration = .5f;
+        [Tooltip("The eye of the player that we need to hide as the main game mechanic of this game")]
         [SerializeField] SpriteRenderer m_playerEyeSprite;
 
         public void Fade(SpriteRenderer spriteRenderer, bool fadeIn, float duration)
@@ -359,9 +481,9 @@ namespace ShadowShift.Fusion
 
         public void OnEnter_Hide(Collider2D collider)
         {
-            m_anim.SetBool("IsHiding", true);
-            Fade(m_playerEyeSprite, false, m_imageFadeDuration);
-            M_PlayerHiddenState = PlayerHiddenState.Hidden;
+            if (HasInputAuthority == false) return;
+
+            RPC_HidePlayerEyeOnServer(true);
         }
         public void OnStay_Hide(Collider2D collider)
         {
@@ -369,9 +491,9 @@ namespace ShadowShift.Fusion
         }
         public void OnExit_Hide(Collider2D collider)
         {
-            m_anim.SetBool("IsHiding", false);
-            Fade(m_playerEyeSprite, true, m_imageFadeDuration);
-            M_PlayerHiddenState = PlayerHiddenState.Open;
+            if (HasInputAuthority == false) return;
+
+            RPC_HidePlayerEyeOnServer(false);
         }
 
         #endregion

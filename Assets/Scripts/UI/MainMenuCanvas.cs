@@ -33,12 +33,15 @@ namespace ShadowShift.UI
         {
             m_swipeControlDefaultScale = SwipeControlImage.rectTransform.localScale;
             m_buttonControlDefaultScale = ButtonsControlImage.rectTransform.localScale;
+
         }
 
         private void Start()
         {
             // so at start, we don't have any room creation state
             M_FusionRoomCreationState = FusionRoomCreationState.None;
+
+            
         }
 
 
@@ -57,6 +60,7 @@ namespace ShadowShift.UI
                 return;
             }
 
+            
             // Get the current scale of the image
             Vector2 currentScale = image.rectTransform.localScale;
 
