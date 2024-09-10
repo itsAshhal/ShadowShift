@@ -383,7 +383,20 @@ namespace ShadowShift.Fusion
             Debug.Log($"Test ID 2");
 
             // simply shutdown the FusionConnection
-            FusionConnection.Instance.M_NetworkRunner.Shutdown();
+            // FusionConnection.Instance.M_NetworkRunner.Shutdown();
+
+            // Check if the local player is the host
+            if (FusionConnection.Instance.M_NetworkRunner.IsServer)
+            {
+                // The host can decide to shutdown the server or transfer host responsibilities
+                FusionConnection.Instance.M_NetworkRunner.Shutdown();
+            }
+            else
+            {
+                // Client-specific logic, if any
+                Debug.Log("Client has left the session");
+                Runner.Despawn(GetComponent<NetworkObject>());
+            }
         }
 
         // Callback when despawning

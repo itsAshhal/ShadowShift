@@ -5,6 +5,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using ShadowShift.Fusion;
 using ShadowShift.DataModels;
+using TMPro;
+using UnityEngine.Events;
 
 namespace ShadowShift.UI
 {
@@ -28,21 +30,69 @@ namespace ShadowShift.UI
 
         public Vector2 m_swipeControlDefaultScale { get; set; }
         public Vector2 m_buttonControlDefaultScale { get; set; }
+        public TMP_Text PlayBtnText;
+
+        [Tooltip("Once the user has completed this number of stages, then he can play multiplayer with his friends")]
+        public int TotalStagesToCompleteToUnlockMultiplayer = 5;
+        [Tooltip("What should happen when the multiplayer is unlocked and the user clicks on it")]
+        public UnityEvent OnMultiplayerUnlocked;
+        [Tooltip("What should happen when the multiplayer is locked and the user clicks on it")]
+        public UnityEvent OnMultiplayerLocked;
+        public TMP_Text MultiplayerText;
+        public Color MultiplayerLockedColor;
+        public Color MultiplayerUnlockedColor;
+        [Tooltip("Once the user has completed this number of stages, then he can play the game with the color of his choice")]
+        public int TotalStagesToCompleteToUnlockColorTheory = 3;
+        [Tooltip("What should happen when the user hasn't completed the specific stages and tries to open the color theory")]
+        public UnityEvent OnColorTheoryLocked;
+        [Tooltip("What happens when the user successfully unlocks the color theory and wants to use it")]
+        public UnityEvent OnColorTheoryUnlocked;
+
 
         private void Awake()
         {
             m_swipeControlDefaultScale = SwipeControlImage.rectTransform.localScale;
             m_buttonControlDefaultScale = ButtonsControlImage.rectTransform.localScale;
-
         }
 
         private void Start()
         {
             // so at start, we don't have any room creation state
             M_FusionRoomCreationState = FusionRoomCreationState.None;
-
-            
+            SetupEitherPlayOrContinue();
+            SetMultiplayerColorForLockedAndUnlockedState();
         }
+
+        public void SetMultiplayerColorForLockedAndUnlockedState()
+        {
+            int stagesCompleted = GameData.LoadData().Stage;
+
+            if (stagesCompleted >= TotalStagesToCompleteToUnlockMultiplayer) MultiplayerText.color = MultiplayerUnlockedColor;
+            else MultiplayerText.color = MultiplayerLockedColor;
+        }
+
+        /// <summary>
+        /// This method checks if the user has already finished off some of the stages then instead of 
+        /// displaying "Play", it's gonna show "Continue". Until and unless the user wants to start over.
+        /// </summary>
+        void SetupEitherPlayOrContinue()
+        {
+            PlayBtnText.text = GameData.LoadData().Stage > 0 ? "Continue" : "Play";
+        }
+
+        /// <summary>
+        /// The main purpose of this method is to identify whether the user can play the multiplayer feature or not.
+        /// He needs to complete the minimum of n number of stages to unlock this feature
+        /// </summary>
+        public void OnClick_MultiplayerBtn()
+        {
+            int stagesCompleted = GameData.LoadData().Stage;
+
+            if (stagesCompleted >= TotalStagesToCompleteToUnlockMultiplayer) OnMultiplayerUnlocked?.Invoke();
+            else OnMultiplayerLocked?.Invoke();
+
+        }
+
 
 
         /// <summary>
@@ -60,7 +110,7 @@ namespace ShadowShift.UI
                 return;
             }
 
-            
+
             // Get the current scale of the image
             Vector2 currentScale = image.rectTransform.localScale;
 
@@ -107,6 +157,17 @@ namespace ShadowShift.UI
 
             Debug.Log($"music value being stored is {value}");
         }
+
+
+        public void OnClick_ColorTheory()
+        {
+            // when the user clicks on the color theory button, we need to enable him to be able to select the color of his choice
+            int totalStages = GameData.LoadData().Stage;
+            if (totalStages < TotalStagesToCompleteToUnlockColorTheory) OnColorTheoryLocked?.Invoke();
+            else OnColorTheoryUnlocked?.Invoke();
+        }
+
+
 
         #region FusionControls
 

@@ -65,6 +65,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Singleton\CinematicsController.cs" />
+    <Compile Include="Assets\Scripts\UI\ColorTheoryCodeManager.cs" />
     <Compile Include="Assets\Epic Toon FX\Demo\Scripts\ETFXEffectController.cs" />
     <Compile Include="Assets\Scripts\UI\SettingsManager.cs" />
     <Compile Include="Assets\Scripts\UI\MainMenuController.cs" />
@@ -124,6 +125,7 @@
     <Compile Include="Assets\Scripts\Music\MusicManager.cs" />
     <Compile Include="Assets\Scripts\Music\LobbyMusicManager.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\ObjectSpin.cs" />
+    <Compile Include="Assets\Scripts\UI\ManualDestroyer.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_PhoneNumberValidator.cs" />
     <Compile Include="Assets\Epic Toon FX\Demo\Scripts\ETFXLoopScript.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexJitter.cs" />
@@ -152,6 +154,7 @@
     <Compile Include="Assets\Scripts\Fusion\LobbyEffectsController.cs" />
     <Compile Include="Assets\Epic Toon FX\Demo\Scripts\VFX Library\UICanvasManager.cs" />
     <Compile Include="Assets\Epic Toon FX\Demo\Scripts\ETFXProjectileScript.cs" />
+    <Compile Include="Assets\Scripts\UI\SavedColorPrefab.cs" />
     <Compile Include="Assets\Scripts\Enemies\WanderingSpotLight.cs" />
     <Compile Include="Assets\Scripts\Fusion\ShootingBall.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextInfoDebugTool.cs" />

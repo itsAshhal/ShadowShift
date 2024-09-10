@@ -21,6 +21,11 @@ namespace ShadowShift.UI
         [SerializeField] float m_scalingDuration;
         public UnityEvent m_startActions;
         public AudioSource MusicAudio;
+        public Transform SavedColorsContentParent;
+        public GameObject SavedColorPrefab;  // so don't have to change a lot of things
+        public List<GameObject> Loaded_UI_Colors;
+        public float DisplayColorsAppearanceDuration = .5f;
+        public Image MainBackground;
 
         private void Awake()
         {
@@ -40,12 +45,42 @@ namespace ShadowShift.UI
             // Loading music data
             LoadMusicValue();
 
+            SetSavedColors();
+
         }
 
         IEnumerator FadeCoroutine()
         {
             yield return new WaitForSeconds(m_fadingStartDuration);
             m_fadeImage.GetComponent<Animator>().CrossFade("FadeOut", .1f);
+        }
+
+        public void SetSavedColors()
+        {
+            // so we can put all the colors into the UI and the us can then select any of those for his pleasure
+            foreach (var data in Loaded_UI_Colors) Destroy(data.gameObject);
+            Loaded_UI_Colors.Clear();
+            StartCoroutine(DisplaySavedColors());
+        }
+
+        IEnumerator DisplaySavedColors()
+        {
+            foreach (var data in GameData.LoadColorData())
+            {
+                var newLoadedColor = Instantiate(SavedColorPrefab, SavedColorsContentParent);
+                string hexColor = data.HexColor;
+
+                Color newColor;
+                if (ColorUtility.TryParseHtmlString(hexColor, out newColor))
+                {
+                    // Apply the new color to the button
+                    newLoadedColor.transform.GetChild(0).GetComponent<Image>().color = newColor;
+                }
+
+                Loaded_UI_Colors.Add(newLoadedColor);
+                yield return new WaitForSeconds(DisplayColorsAppearanceDuration);
+            }
+
         }
 
         public void LoadMusicValue()
@@ -55,6 +90,8 @@ namespace ShadowShift.UI
             m_mainMenuCanvas.MusicSlider.value = musicValue;
             MusicAudio.volume = musicValue;
         }
+
+        public void ChangeMainMenuBackground(Color newBackgroundColor) => MainBackground.color = newBackgroundColor;
 
 
         public void ChangeControls(string controlString)

@@ -7,6 +7,7 @@ using Random = UnityEngine.Random;
 using System.Collections.Specialized;
 using Unity.VisualScripting;
 using UnityEngine.SceneManagement;
+using ShadowShift.DataModels;
 
 namespace ShadowShift.Player
 {
@@ -22,6 +23,7 @@ namespace ShadowShift.Player
 
         private Rigidbody2D m_rb;
         [SerializeField] Animator m_anim;  // this is the main object, the black player as the child of this controller
+        public SpriteRenderer MainSprite { get; set; }
         private Quaternion m_originalRotation;
 
         public enum PlayerHiddenState
@@ -44,6 +46,8 @@ namespace ShadowShift.Player
             m_rb = GetComponent<Rigidbody2D>();
             //m_anim = GetComponent<Animator>();
 
+            MainSprite = m_anim.GetComponent<SpriteRenderer>();
+
 
             // setting up input controls with actions
             InputController.Instance.OnMoveRight += OnMovePlayerRight;
@@ -52,6 +56,16 @@ namespace ShadowShift.Player
             InputController.Instance.OnPressJump += OnPlayerJump;
 
             m_originalRotation = transform.rotation;
+
+            SetPlayerColor();
+        }
+
+        void SetPlayerColor()
+        {
+            // change the color of the player's main sprite as well
+            var selectedColor = GameData.SelectedColor;
+            selectedColor.a = 1.0f;
+            MainSprite.color = selectedColor;
         }
 
         void Update()

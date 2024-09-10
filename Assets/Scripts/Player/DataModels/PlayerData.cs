@@ -16,10 +16,35 @@ namespace ShadowShift.DataModels
     }
 
 
+    [System.Serializable]
+    public class ColorData
+    {
+        public string HexColor = string.Empty;
+    }
+
+
     public static class GameData
     {
         public static string FileName = "PlayerData";
+        public static string SavedColorsFileName = "PlayerColors";
         static List<PlayerData> m_playerDataList = new List<PlayerData>();
+        static List<ColorData> m_colorData = new List<ColorData>();
+        public static Color SelectedColor = Color.black;
+
+        public static void SaveColorData(ColorData colorData, bool append = false)
+        {
+            m_colorData.Clear();
+            m_colorData.Add(colorData);
+
+            // save this list to the JSON file
+            FileHandler.SaveToJSON(m_colorData, SavedColorsFileName, append); // also we don't need to append anything, just override the data
+            Debug.Log($"New color saved");
+        }
+        public static List<ColorData> LoadColorData()
+        {
+            var loadedData = FileHandler.ReadFromJSON<ColorData>(SavedColorsFileName);
+            return loadedData;
+        }
         public static void SaveData(PlayerData playerData, bool append = false)
         {
             m_playerDataList.Clear();
@@ -39,6 +64,7 @@ namespace ShadowShift.DataModels
         }
 
         public static bool FileExists() => FileHandler.JSONFileExists(FileName);
+        public static bool ColorFileExists() => FileHandler.JSONFileExists(SavedColorsFileName);
     }
 }
 
