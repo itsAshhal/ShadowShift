@@ -128,9 +128,9 @@ namespace ShadowShift.Fusion
         }
 
 
-/// <summary>
-/// Remove the boundaries of the lobby when the game starts so player can move freely and enjoy the actual game
-/// </summary>
+        /// <summary>
+        /// Remove the boundaries of the lobby when the game starts so player can move freely and enjoy the actual game
+        /// </summary>
         public void RemoveLobbyBoundaries()
         {
             foreach (var anim in LobbyBoundaries) anim.CrossFade("Disappear", .1f);

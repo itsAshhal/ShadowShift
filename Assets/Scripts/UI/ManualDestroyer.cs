@@ -18,7 +18,7 @@ namespace ShadowShift
         /// </summary>
         public void StartHidingTimer()
         {
-            Invoke(nameof(HideFinally),IdealHideTime);
+            Invoke(nameof(HideFinally), IdealHideTime);
         }
 
         void HideFinally()

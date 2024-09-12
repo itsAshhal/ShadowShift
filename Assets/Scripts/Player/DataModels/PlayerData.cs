@@ -29,7 +29,17 @@ namespace ShadowShift.DataModels
         public static string SavedColorsFileName = "PlayerColors";
         static List<PlayerData> m_playerDataList = new List<PlayerData>();
         static List<ColorData> m_colorData = new List<ColorData>();
+
+
+        /// <summary>
+        /// The current selected color by the player, which is gonna be used in the gameplay
+        /// </summary>
         public static Color SelectedColor = Color.black;
+
+        /// <summary>
+        /// If true then all the sprites in the gameplay will also be reflected towards the selected player color
+        /// </summary>
+        public static bool ToggleStageColors = false;
 
         public static void SaveColorData(ColorData colorData, bool append = false)
         {

@@ -10,20 +10,24 @@ namespace ShadowShift.Enemy
     {
         // ok so when this gameObject is instantiated, we need it to move towards the mainPlayer
         public float m_movingSpeed = 2f;
-        Vector2 m_target;
+        Vector2 m_targetDirection;
 
         private void Start()
         {
-            m_target = GameplayController.Instance.MainPlayer.transform.position;
+            // we need to see this target as the position to get direction towards, otherwise the ball would stop when reaching that position
+            m_targetDirection = GameplayController.Instance.MainPlayer.transform.position - transform.position;
         }
         private void Update()
         {
             if (GameplayController.Instance.MainPlayer == null) return;
-            transform.position = Vector2.MoveTowards(
-                transform.position,
-                m_target,
-                m_movingSpeed * Time.deltaTime
-                );
+
+            transform.Translate(m_targetDirection * m_movingSpeed * Time.deltaTime);
+
+            // transform.position = Vector2.MoveTowards(
+            //     transform.position,
+            //     m_target,
+            //     m_movingSpeed * Time.deltaTime
+            //     );
         }
 
         private void OnTriggerEnter2D(Collider2D collision)
