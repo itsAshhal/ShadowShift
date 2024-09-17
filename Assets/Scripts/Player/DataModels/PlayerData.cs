@@ -52,6 +52,8 @@ namespace ShadowShift.DataModels
         }
         public static List<ColorData> LoadColorData()
         {
+            if (FileHandler.JSONFileExists(SavedColorsFileName) == false) return null;
+
             var loadedData = FileHandler.ReadFromJSON<ColorData>(SavedColorsFileName);
             return loadedData;
         }

@@ -9,6 +9,8 @@ namespace ShadowShift
         public ParticleSystem[] DeathEffects;
         public ParticleSystem ShootingBalls;
         public ParticleSystem[] ExplosionEffects;
+        [Tooltip("When the player enters the area of this smoke, he's gonna pushed away to the specific direction")]
+        public ParticleSystem PushingSmoke;
 
         /// <summary>
         /// Spawn a particle using this method to make it easier
@@ -20,6 +22,7 @@ namespace ShadowShift
         {
             Destroy(Instantiate(part, spawnPosition, Quaternion.identity), destroyTime);
         }
+
 
 
         public static EffectsController Instance;

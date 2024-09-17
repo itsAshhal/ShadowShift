@@ -46,7 +46,7 @@ GameObject:
   - component: {fileID: 2640094911920284495}
   m_Layer: 0
   m_Name: Spikes
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -83,6 +83,7 @@ MonoBehaviour:
   m_bottomSpikeAppearAnimationStateName: Appear
   m_bottomSpikeDisappearAnimationStateName: Disappear
   m_spikeAppearDuration: 2
+  m_startAfter: 1
 --- !u!95 &7644467902094010292
 Animator:
   serializedVersion: 5

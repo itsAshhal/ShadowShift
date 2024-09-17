@@ -47,6 +47,33 @@ namespace ShadowShift.UI
 
             SetSavedColors();
 
+            DisplayToggleColorScreen();
+
+        }
+
+        /// <summary>
+        /// Whether or not we should display the toggle screen to the user!?, based
+        /// on his stages completed
+        /// </summary>
+        public void DisplayToggleColorScreen()
+        {
+            if (GameData.LoadColorData() == null)
+            {
+                m_mainMenuCanvas.ToggleControllerScreen.SetActive(false);
+                return;
+            }
+
+            bool displayCondition = (
+                GameData.LoadData().Stage >= m_mainMenuCanvas.TotalStagesToCompleteToUnlockColorTheory
+                &&
+                GameData.LoadColorData().Count > 0
+            );
+
+            // also we need to check one more thing, if there are any colors then show this option, otherwise there's no point
+
+            m_mainMenuCanvas.ToggleControllerScreen.SetActive(displayCondition);
+
+
         }
 
         IEnumerator FadeCoroutine()
@@ -65,21 +92,25 @@ namespace ShadowShift.UI
 
         IEnumerator DisplaySavedColors()
         {
-            foreach (var data in GameData.LoadColorData())
+            if (GameData.LoadColorData() != null)
             {
-                var newLoadedColor = Instantiate(SavedColorPrefab, SavedColorsContentParent);
+                foreach (var data in GameData.LoadColorData())
+                {
+                    var newLoadedColor = Instantiate(SavedColorPrefab, SavedColorsContentParent);
                 string hexColor = data.HexColor;
 
-                Color newColor;
-                if (ColorUtility.TryParseHtmlString(hexColor, out newColor))
-                {
-                    // Apply the new color to the button
-                    newLoadedColor.transform.GetChild(0).GetComponent<Image>().color = newColor;
-                }
+                    Color newColor;
+                    if (ColorUtility.TryParseHtmlString(hexColor, out newColor))
+                    {
+                        // Apply the new color to the button
+                        newLoadedColor.transform.GetChild(0).GetComponent<Image>().color = newColor;
+                    }
 
-                Loaded_UI_Colors.Add(newLoadedColor);
-                yield return new WaitForSeconds(DisplayColorsAppearanceDuration);
+                    Loaded_UI_Colors.Add(newLoadedColor);
+                    yield return new WaitForSeconds(DisplayColorsAppearanceDuration);
+                }
             }
+
 
         }
 

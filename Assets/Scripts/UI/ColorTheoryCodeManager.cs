@@ -64,12 +64,15 @@ namespace shadowShift.UI
 
 
                 // first check if this color exists or not, we don't need to save duplicate colors
-                foreach (var data in GameData.LoadColorData())
+                if (GameData.LoadColorData() != null)
                 {
-                    if (data.HexColor == currentHexCode)
+                    foreach (var data in GameData.LoadColorData())
                     {
-                        OnHexCodeNonValidated?.Invoke();
-                        return;
+                        if (data.HexColor == currentHexCode)
+                        {
+                            OnHexCodeNonValidated?.Invoke();
+                            return;
+                        }
                     }
                 }
 

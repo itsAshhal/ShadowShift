@@ -47,6 +47,7 @@ namespace ShadowShift.UI
         public UnityEvent OnColorTheoryLocked;
         [Tooltip("What happens when the user successfully unlocks the color theory and wants to use it")]
         public UnityEvent OnColorTheoryUnlocked;
+        public GameObject ToggleControllerScreen;
 
 
         private void Awake()

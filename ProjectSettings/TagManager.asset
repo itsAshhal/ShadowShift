@@ -9,6 +9,7 @@ TagManager:
   - Controls
   - VolcanicSpikes
   - Enemy
+  - PushingSmoke
   layers:
   - Default
   - TransparentFX

@@ -18,11 +18,16 @@ namespace ShadowShift
 
         private void Start()
         {
-            if (!SpawnEnemies) return;
-            for (int i = 0; i < EnemySpawnPositions.Length; i++)
+            if (SpawnEnemies)
             {
-                Instantiate(Enemies[i], EnemySpawnPositions[i].position, Quaternion.identity);
+                for (int i = 0; i < EnemySpawnPositions.Length; i++)
+                {
+                    Instantiate(Enemies[i], EnemySpawnPositions[i].position, Quaternion.identity);
+                }
             }
+
+
+            Debug.Log($"Start method is called and the GameData.Selector color is {GameData.SelectedColor}");
 
             ApplyColorToAllTheStageAsWell = GameData.ToggleStageColors;
 
@@ -32,6 +37,7 @@ namespace ShadowShift
 
         void ApplyColorToTheStageAsWell()
         {
+            Debug.Log($"Apply color function is called");
             foreach (var sprite in StageSprites)
             {
                 Color color = GameData.SelectedColor;

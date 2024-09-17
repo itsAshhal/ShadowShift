@@ -8,6 +8,7 @@ using System.Collections.Specialized;
 using Unity.VisualScripting;
 using UnityEngine.SceneManagement;
 using ShadowShift.DataModels;
+using ShadowShift.Enemy;
 
 namespace ShadowShift.Player
 {
@@ -290,6 +291,60 @@ namespace ShadowShift.Player
 
         }
         public void OnExit_Enemy(Collider2D collider)
+        {
+
+        }
+
+
+        #endregion
+
+
+        #region PushingSmoke
+        public void OnEnter_PushingSmoke(Collider2D collider)
+        {
+
+        }
+        public void OnStay_PushingSmoke(Collider2D collider)
+        {
+            // ok so here when we are in stay mode with this kind of trigger,
+            // we need to make sure about the kind of force being applied to us
+
+
+
+            // Get the direction var from the PushingSmoke Script
+            collider.transform.parent.TryGetComponent<PushingSmoke>(out PushingSmoke pushingSmoke);
+            if (pushingSmoke == null) return;
+
+            Vector2 appliedForce = Vector2.zero;
+            float maxForce = pushingSmoke.MaxForce;
+
+            var forceDirection = pushingSmoke.M_ForceDirection;
+            switch (forceDirection)
+            {
+                case PushingSmoke.ForceDirection.FromBottom:
+                    appliedForce = Vector2.up;
+                    break;
+
+                case PushingSmoke.ForceDirection.FromTop:
+                    appliedForce = Vector2.down;
+                    break;
+
+                case PushingSmoke.ForceDirection.FromRight:
+                    appliedForce = Vector2.left;
+                    break;
+
+                case PushingSmoke.ForceDirection.FromLeft:
+                    appliedForce = Vector2.right;
+                    break;
+            }
+
+            Debug.Log($"Pushing Smoke On Stay Is Working, force is {appliedForce}");
+
+            // Apply a smooth force over time using AddForce instead of setting velocity directly
+            m_rb.AddForce(appliedForce * maxForce, ForceMode2D.Force); // ForceMode2D.Force applies a continuous force over time
+
+        }
+        public void OnExit_PushingSmoke(Collider2D collider)
         {
 
         }

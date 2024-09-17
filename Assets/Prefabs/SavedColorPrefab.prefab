@@ -236,6 +236,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cef022e3433d0574998b8475b4b5e228, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Opacity: 0.25
 --- !u!114 &8023201916375231233
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -263,7 +264,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  AnimationDuration: 0.5
+  AnimationDuration: 0.15
   TargetScale: {x: 1.5, y: 1.5, z: 1.5}
   EaseType: 25
 --- !u!114 &8959439912160734370
