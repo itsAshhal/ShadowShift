@@ -2,7 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using ShadowShift.DataModels;
-
+using ShadowShift.Player;
+//
 namespace ShadowShift
 {
     public class Stage : MonoBehaviour
@@ -16,8 +17,17 @@ namespace ShadowShift
         [Tooltip("So we can apply custom colors to all these sprites")]
         public SpriteRenderer[] StageSprites;
 
+        [Tooltip("Reserved for last stages perhaps")]
+        public bool CanDoSlowMo = false;
+        [Tooltip("This animators' speed will be effected if the slow mo feature is enabled in this stage")]
+        public Animator[] SlowMoAnimators;
+
+        public bool IsLastStage = false;
+
         private void Start()
         {
+            CheckForSlowmoPermission();
+
             if (SpawnEnemies)
             {
                 for (int i = 0; i < EnemySpawnPositions.Length; i++)
@@ -33,6 +43,12 @@ namespace ShadowShift
 
             if (ApplyColorToAllTheStageAsWell == false) return;
             ApplyColorToTheStageAsWell();
+
+        }
+
+        void CheckForSlowmoPermission()
+        {
+            GameplayController.Instance.M_CanvasManager.SlowMoButton.SetActive(CanDoSlowMo ? true : false);
         }
 
         void ApplyColorToTheStageAsWell()
@@ -45,5 +61,7 @@ namespace ShadowShift
                 sprite.color = color;
             }
         }
+
+
     }
 }

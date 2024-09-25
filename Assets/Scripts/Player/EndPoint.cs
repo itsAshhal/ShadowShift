@@ -80,7 +80,8 @@ namespace ShadowShift.Player
 
         void RestartScene()
         {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            if (GameplayController.Instance.CurrentStage.IsLastStage) SceneManager.LoadScene("MainMenu");
+            else SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
 
     }

@@ -633,6 +633,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 85b0235ad28af0a4f9206b63076d03ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  MainAudioSource: {fileID: 229635107}
+  AudioClips:
+  - {fileID: 8300000, guid: e12257911e273614a9af416cbb59b731, type: 3}
+  - {fileID: 8300000, guid: 52236ee15d2549b468d62aa3d53816ec, type: 3}
+  - {fileID: 8300000, guid: 9f9007bd8f3568643ac8feacc4cf8e82, type: 3}
 --- !u!1 &31524603
 GameObject:
   m_ObjectHideFlags: 0
@@ -6801,12 +6806,12 @@ RectTransform:
   - {fileID: 590431367}
   - {fileID: 1277338585}
   - {fileID: 1775000486}
-  - {fileID: 2042446451}
   - {fileID: 1113533262}
   - {fileID: 2120078989}
   - {fileID: 793383656}
   - {fileID: 1065256397}
   - {fileID: 388758037}
+  - {fileID: 2042446451}
   - {fileID: 497289019}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

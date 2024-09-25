@@ -51,5 +51,14 @@ MonoBehaviour:
   m_allStages:
   - {fileID: 51292383215895362, guid: ca467bd132668294eb6c12dbf7374501, type: 3}
   - {fileID: 51292383215895362, guid: e37c40be0f05014448ce1a964b2e19ec, type: 3}
-  - {fileID: 51292383215895362, guid: e37c40be0f05014448ce1a964b2e19ec, type: 3}
+  - {fileID: 51292383215895362, guid: 38fadc95357790643aee67bda5c3f33a, type: 3}
+  - {fileID: 51292383215895362, guid: 2587f025ab191f149a8aaf71c36016b7, type: 3}
+  - {fileID: 51292383215895362, guid: 1340412b1b3606b449b24a8a64c6f9b6, type: 3}
+  - {fileID: 51292383215895362, guid: 6190a50f86d96c0409bd1019dea2bb2f, type: 3}
+  - {fileID: 51292383215895362, guid: 69412ec7010955945b40b3f46965e554, type: 3}
+  - {fileID: 51292383215895362, guid: 4052a9fdcd021af4583d0690a2e6b606, type: 3}
+  - {fileID: 51292383215895362, guid: d48ddf4874e157a49bce85a575b71d5c, type: 3}
   M_GameplayState: 0
+  SlowMotionSpeed: 0.5
+  CanDoSlowMo: 1
+  SlowMotionRegenWait: 3

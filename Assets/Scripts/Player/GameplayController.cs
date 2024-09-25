@@ -6,6 +6,7 @@ using ShadowShift.DataModels;
 using System;
 using Random = UnityEngine.Random;
 using Cinemachine;
+using UnityEngine.UI;
 
 namespace ShadowShift.Player
 {
@@ -27,6 +28,18 @@ namespace ShadowShift.Player
 
         public GameplayState M_GameplayState;
         public PlayerController MainPlayer { get; private set; }
+
+        private Stage m_currentStage;
+        public Stage CurrentStage => m_currentStage;
+
+        [Tooltip("This will only work on the last and allowed stages")]
+        public float SlowMotionSpeed = .5f;
+
+        public Action<bool> OnPressSlowMo;
+        public bool CanDoSlowMo = true;
+        public float SlowMotionRegenWait = 3.0f;
+
+
 
 
         public static GameplayController Instance;
@@ -83,7 +96,18 @@ namespace ShadowShift.Player
             {
                 Debug.Log($"StageIndex is {stageIndex}");
                 Stage spawnedStage = Instantiate(m_allStages[stageIndex], Vector3.zero, Quaternion.identity);
+                m_currentStage = spawnedStage;
                 MainPlayer.transform.position = spawnedStage.PlayerSpawnPosition.position;
+
+                // check if the current stage can do slow mo effect, so we can enable the required button
+                if (m_currentStage.CanDoSlowMo)
+                {
+                    m_canvasManager.SlowMoButton.SetActive(true);
+
+                    // bind the method as well
+                    m_canvasManager.SlowMoButton.GetComponent<Button>().onClick.AddListener(this.ApplySlowMotionEffect);
+                }
+
             }
             catch (Exception e)
             {
@@ -112,6 +136,39 @@ namespace ShadowShift.Player
             return new Vector2(Mathf.Cos(radian), Mathf.Sin(radian));
         }
 
+        public void ApplySlowMotionEffect()
+        {
+            // we need to invoke this action and make sure other elements subscribe to this
+            if (CanDoSlowMo == false) return;
+
+            StartCoroutine(SlowMoCoroutine());
+
+        }
+
+        IEnumerator SlowMoCoroutine()
+        {
+            CanDoSlowMo = false;
+
+            OnPressSlowMo?.Invoke(true);
+
+            // get the animator component of the SlowmoButton as well
+            var slowmoBtn = m_canvasManager.SlowMoButton;
+            var anim = slowmoBtn.GetComponent<Animator>();
+
+            anim.CrossFade("Disappear", .1f);
+
+            yield return new WaitForSeconds(SlowMotionRegenWait);
+            anim.CrossFade("Appear", .1f);
+
+
+            CanDoSlowMo = true;
+            OnPressSlowMo?.Invoke(false);
+
+        }
+        public void RemoveSlowMotionEffect()
+        {
+            //m_currentStage.ApplySlowMoEffect(false, 1.0f);
+        }
 
     }
 

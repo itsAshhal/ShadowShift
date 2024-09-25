@@ -34,6 +34,8 @@ namespace ShadowShift.UI
         public Image FadeImage;
         public Slider ZoomSlider;
         public Slider HeightSlider;
+        [Tooltip("So we can use it last stages when we're allowed to use it")]
+        public GameObject SlowMoButton;
 
 
         public void OnValueChange_CameraUpDown(float value)

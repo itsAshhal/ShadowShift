@@ -10,6 +10,7 @@ TagManager:
   - VolcanicSpikes
   - Enemy
   - PushingSmoke
+  - FlyingSpikeGround
   layers:
   - Default
   - TransparentFX

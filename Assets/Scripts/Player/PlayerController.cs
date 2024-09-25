@@ -352,8 +352,71 @@ namespace ShadowShift.Player
 
         #endregion
 
+
+        #region FlyingSpikeGround
+
+        private float _playerX;
+
+
+        public void OnEnter_FlyingSpikeGround(Collider2D collider)
+        {
+            transform.position = new Vector3(collider.transform.position.x, transform.position.y);
+
+
+            m_canJump = true;
+
+            m_anim.SetBool("IsJumping", false);
+
+            _playerX = transform.position.x;
+
+            transform.rotation = m_originalRotation;
+
+            // Play the OnTouchGround animation as well
+            m_anim.CrossFade("OnTouchGround", .1f);
+
+            // since when we touch the ground, make sure to retreat to the default original rotation as well
+            // Getting reference to the default rotation
+            if (InputController.Instance.M_PreviousMovement == InputController.PreviousMovement.Right) transform.right = Vector2.right;
+            else if (InputController.Instance.M_PreviousMovement == InputController.PreviousMovement.Left) transform.right = Vector2.left;
+        }
+        public void OnStay_FlyingSpikeGround(Collider2D collider)
+        {
+            m_canJump = true;
+            this.transform.parent = collider.transform;
+
+            // when we're at the staying stage we need to make sure the player doesn't get slipped
+        }
+        public void OnExit_FlyingSpikeGround(Collider2D collider)
+        {
+            this.transform.parent = null;
+
+            m_canJump = false;
+            m_anim.SetBool("IsJumping", true);
+
+            Debug.Log($"OnExit called");
+
+        }
         #endregion
 
+
+
+
+        #endregion
+
+        #region SlowMotionSettings
+
+        [ContextMenu("Apply Slow Motion")]
+        public void DoSlowMotion()
+        {
+            GameplayController.Instance.ApplySlowMotionEffect();
+        }
+        [ContextMenu("Remove Slow Motion")]
+        public void UnDoSlowMotion()
+        {
+            GameplayController.Instance.RemoveSlowMotionEffect();
+        }
+
+        #endregion
 
 
         private void OnDisable()

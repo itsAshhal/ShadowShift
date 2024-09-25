@@ -1,6 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using ShadowShift.Player;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace ShadowShift
 {
@@ -12,6 +15,27 @@ namespace ShadowShift
         [Tooltip("When the player enters the area of this smoke, he's gonna pushed away to the specific direction")]
         public ParticleSystem PushingSmoke;
 
+        public ParticleSystem[] ThunderParticles;
+
+        private void Start()
+        {
+            GameplayController.Instance.OnPressSlowMo += this.OnPressSlowMo_Method;
+        }
+
+        private void OnPressSlowMo_Method(bool value)
+        {
+            if (value == false) return;
+
+            // so this will automatically be called when the player applies the slow motion
+            // we need to apply the thunder effect
+            SpawnParticle(GameplayController.Instance.MainPlayer.transform.position,
+            ThunderParticles[Random.Range(0, ThunderParticles.Length)],
+            1f
+            );
+        }
+
+
+
         /// <summary>
         /// Spawn a particle using this method to make it easier
         /// </summary>
@@ -22,6 +46,8 @@ namespace ShadowShift
         {
             Destroy(Instantiate(part, spawnPosition, Quaternion.identity), destroyTime);
         }
+
+
 
 
 

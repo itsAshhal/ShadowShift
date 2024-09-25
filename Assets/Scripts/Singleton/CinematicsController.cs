@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
+using ShadowShift.Player;
+using System;
+using UnityEngine.Rendering;
 
 namespace ShadowShift
 {
@@ -12,6 +15,9 @@ namespace ShadowShift
     public class CinematicsController : MonoBehaviour
     {
         public CinemachineVirtualCamera MainCamera;
+        public Volume GlobalVolume;
+        public VolumeProfile SimpleProfile;
+        public VolumeProfile ThunderProfile;
         public float M_AmplitudeLow = 1f;
         public float M_AmplitudeMedium = 1f;
         public float M_AmplitudeHigh = 1f;
@@ -28,6 +34,19 @@ namespace ShadowShift
             }
             else Instance = this;
         }
+
+        private void Start()
+        {
+            GameplayController.Instance.OnPressSlowMo += this.OnPressSlowmo_Method;
+            GlobalVolume.profile = SimpleProfile;
+        }
+
+        private void OnPressSlowmo_Method(bool value)
+        {
+            GlobalVolume.profile = value ? ThunderProfile : SimpleProfile;
+            if (value) ApplyShake(.5f);
+        }
+
         public void ApplyShake(float duration)
         {
             StartCoroutine(ShakeCoroutine(duration));

@@ -45,6 +45,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MainCamera: {fileID: 0}
+  GlobalVolume: {fileID: 0}
+  SimpleProfile: {fileID: 11400000, guid: 804956b74c88afb4f91e200b2f61ea6e, type: 2}
+  ThunderProfile: {fileID: 11400000, guid: 01ea29d26be4dda4581c6e62f7aa34bb, type: 2}
   M_AmplitudeLow: 1
   M_AmplitudeMedium: 2.5
   M_AmplitudeHigh: 5

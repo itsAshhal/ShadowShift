@@ -26,12 +26,22 @@ namespace ShadowShift.Enemy
         [Header("Emission Events")]
         public UnityEvent OnEmissionEnabled;
         public UnityEvent OnEmissionDisabled;
+        [Tooltip("If turned on then the emission will always be on and won't get turned off")]
+        public bool StayActive = false;
 
 
         private void Start()
         {
             m_currentParticleSystem = GetComponent<ParticleSystem>();
-            InvokeRepeating(nameof(ManageEmission), Random.Range(EmissionOffMinTime, EmissionOffMaxTime), Random.Range(EmissionOffMinTime, EmissionOffMaxTime));
+
+            if (!StayActive) InvokeRepeating(nameof(ManageEmission), Random.Range(EmissionOffMinTime, EmissionOffMaxTime), Random.Range(EmissionOffMinTime, EmissionOffMaxTime));
+            else
+            {
+                var emission = m_currentParticleSystem.emission;
+                emission.enabled = true;
+            }
+
+
 
         }
 

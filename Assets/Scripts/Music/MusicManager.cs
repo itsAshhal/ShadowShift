@@ -9,6 +9,8 @@ namespace ShadowShift.Music
     public class MusicManager : MonoBehaviour
     {
         private static MusicManager instance;
+        public AudioSource MainAudioSource;
+        public AudioClip[] AudioClips;
 
         void Awake()
         {
@@ -37,6 +39,12 @@ namespace ShadowShift.Music
                 // it means we're at the lobby scene and we don't need the old music
                 Destroy(this.gameObject);
             }
+
+            // randomly change the audio source
+            int index = Random.Range(0, AudioClips.Length);
+            MainAudioSource.clip = AudioClips[index];
+            MainAudioSource.Stop();
+            MainAudioSource.Play();
         }
     }
 
